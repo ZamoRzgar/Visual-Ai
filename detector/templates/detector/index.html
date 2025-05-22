@@ -49,17 +49,59 @@
     <div class="col-lg-8 mx-auto">
         <div class="card shadow">
             <div class="card-body">
-                <div id="video-container">
-                    <video id="webcam" autoplay playsinline></video>
-                    <canvas id="canvas"></canvas>
-                    <img id="processed-image" src="" alt="Processed Image" style="display: none;">
-                </div>
+                <ul class="nav nav-tabs mb-4" id="detectionTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="webcam-tab" data-bs-toggle="tab" data-bs-target="#webcam-content" type="button" role="tab" aria-controls="webcam-content" aria-selected="true">
+                            <i class="fas fa-camera me-2"></i>Webcam
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="upload-tab" data-bs-toggle="tab" data-bs-target="#upload-content" type="button" role="tab" aria-controls="upload-content" aria-selected="false">
+                            <i class="fas fa-upload me-2"></i>Upload Image
+                        </button>
+                    </li>
+                </ul>
                 
-                <div class="control-panel">
-                    <div class="d-flex justify-content-between">
-                        <button id="start-btn" class="btn btn-primary">Start Webcam</button>
-                        <button id="capture-btn" class="btn btn-success" disabled>Capture & Detect</button>
-                        <button id="stop-btn" class="btn btn-danger" disabled>Stop</button>
+                <div class="tab-content" id="detectionTabsContent">
+                    <!-- Webcam Tab -->
+                    <div class="tab-pane fade show active" id="webcam-content" role="tabpanel" aria-labelledby="webcam-tab">
+                        <div id="video-container">
+                            <video id="webcam" autoplay playsinline></video>
+                            <canvas id="canvas"></canvas>
+                            <img id="processed-image" src="" alt="Processed Image" style="display: none;">
+                        </div>
+                        
+                        <div class="control-panel">
+                            <div class="d-flex justify-content-between">
+                                <button id="start-btn" class="btn btn-primary">Start Webcam</button>
+                                <button id="capture-btn" class="btn btn-success" disabled>Capture & Detect</button>
+                                <button id="stop-btn" class="btn btn-danger" disabled>Stop</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Upload Tab -->
+                    <div class="tab-pane fade" id="upload-content" role="tabpanel" aria-labelledby="upload-tab">
+                        <form id="upload-form" method="post" action="{% url 'detect_objects' %}" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="upload-container text-center p-4">
+                                <div class="upload-preview mb-4">
+                                    <img id="upload-preview" src="" alt="" class="img-fluid rounded mb-3" style="max-height: 300px; display: none;">
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label for="image-upload" class="form-label custom-file-upload btn btn-outline-primary btn-lg">
+                                        <i class="fas fa-cloud-upload-alt me-2"></i> Select Image
+                                    </label>
+                                    <input id="image-upload" name="image_upload" type="file" accept="image/*" style="display: none;" class="form-control">
+                                    <div id="upload-help" class="form-text mt-2">Supported formats: JPG, PNG, JPEG</div>
+                                </div>
+                                
+                                <button type="submit" id="detect-upload-btn" class="btn btn-success btn-lg" disabled>
+                                    <i class="fas fa-search me-2"></i> Detect Objects
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
                 
@@ -88,6 +130,7 @@
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Webcam elements
     const webcamElement = document.getElementById('webcam');
     const canvasElement = document.getElementById('canvas');
     const processedImageElement = document.getElementById('processed-image');
@@ -99,9 +142,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const imageDataInput = document.getElementById('image-data');
     const detectionForm = document.getElementById('detection-form');
     
+    // Upload elements
+    const imageUploadInput = document.getElementById('image-upload');
+    const uploadPreviewElement = document.getElementById('upload-preview');
+    const detectUploadButton = document.getElementById('detect-upload-btn');
+    
     let stream = null;
     
-    // Event listeners
+    // ---------- WEBCAM FUNCTIONALITY ----------
+    
+    // Event listeners for webcam
     startButton.addEventListener('click', startWebcam);
     captureButton.addEventListener('click', captureAndDetect);
     stopButton.addEventListener('click', stopWebcam);
@@ -175,6 +225,49 @@ document.addEventListener('DOMContentLoaded', function() {
         startButton.disabled = false;
         captureButton.disabled = true;
         stopButton.disabled = true;
+    }
+    
+    // ---------- IMAGE UPLOAD FUNCTIONALITY ----------
+    
+    // Event listener for image upload
+    if (imageUploadInput) {
+        imageUploadInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                // Check if file is an image
+                if (!file.type.match('image.*')) {
+                    alert('Please select an image file (jpg, png, jpeg)');
+                    imageUploadInput.value = '';
+                    return;
+                }
+                
+                // Preview the selected image
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    uploadPreviewElement.src = e.target.result;
+                    uploadPreviewElement.style.display = 'block';
+                    detectUploadButton.disabled = false;
+                }
+                reader.readAsDataURL(file);
+            } else {
+                uploadPreviewElement.src = '';
+                uploadPreviewElement.style.display = 'none';
+                detectUploadButton.disabled = true;
+            }
+        });
+    }
+    
+    // Tab switching behavior to stop webcam when switching to upload tab
+    const webcamTab = document.getElementById('webcam-tab');
+    const uploadTab = document.getElementById('upload-tab');
+    
+    if (uploadTab) {
+        uploadTab.addEventListener('shown.bs.tab', function() {
+            // Stop webcam when switching to upload tab
+            if (stream) {
+                stopWebcam();
+            }
+        });
     }
 });
 </script>

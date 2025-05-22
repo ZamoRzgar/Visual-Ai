@@ -51,27 +51,43 @@ def detect_objects(request):
                 context['error'] = 'Failed to load detection model'
                 return render(request, 'detector/index.html', context)
         
-        # Get image data from form
-        image_data = request.POST.get('image_data', '')
-        print(f"Image data received: {len(image_data) if image_data else 0} characters")
+        # Check for the source of the image (webcam or file upload)
+        frame = None
         
-        if not image_data or not image_data.startswith('data:image'):
-            context['error'] = 'Invalid image data received'
-            print(f"Invalid image data: {image_data[:50] if image_data else 'None'}")
+        # Method 1: Get image data from webcam capture (base64 data)
+        image_data = request.POST.get('image_data', '')
+        if image_data and image_data.startswith('data:image'):
+            print(f"Processing webcam image: {len(image_data)} characters")
+            # Extract the base64 data
+            image_data = image_data.split(',')[1]
+            image_bytes = base64.b64decode(image_data)
+            print(f"Decoded image bytes: {len(image_bytes)} bytes")
+            
+            # Convert to numpy array for OpenCV processing
+            np_arr = np.frombuffer(image_bytes, np.uint8)
+            frame = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
+            print(f"Frame shape from webcam: {frame.shape if frame is not None else 'None'}")
+        
+        # Method 2: Get image from file upload
+        elif 'image_upload' in request.FILES:
+            uploaded_file = request.FILES['image_upload']
+            print(f"Processing uploaded image: {uploaded_file.name}, size: {uploaded_file.size} bytes")
+            
+            # Read the file content
+            file_bytes = uploaded_file.read()
+            
+            # Convert to numpy array for OpenCV processing
+            np_arr = np.frombuffer(file_bytes, np.uint8)
+            frame = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
+            print(f"Frame shape from upload: {frame.shape if frame is not None else 'None'}")
+        
+        else:
+            context['error'] = 'No image data received. Please either capture an image or upload a file.'
+            print("No image data received")
             return render(request, 'detector/index.html', context)
         
-        # Extract the base64 data
-        image_data = image_data.split(',')[1]
-        image_bytes = base64.b64decode(image_data)
-        print(f"Decoded image bytes: {len(image_bytes)} bytes")
-        
-        # Convert to numpy array for OpenCV processing
-        np_arr = np.frombuffer(image_bytes, np.uint8)
-        frame = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
-        print(f"Frame shape: {frame.shape if frame is not None else 'None'}")
-        
         if frame is None:
-            context['error'] = 'Failed to decode image data'
+            context['error'] = 'Failed to decode image data. Please try a different image.'
             return render(request, 'detector/index.html', context)
         
         # Run inference
@@ -171,6 +187,6 @@ def generate_description(detections):
     
     # Add information about the most confident object
     description += f". I'm most confident about the {most_confident['name']} " \
-                  f"({most_confident['confidence']:.1%} sure)."
+                  f"({most_confident['confidence']:.1f}% sure)."
     
     return description
