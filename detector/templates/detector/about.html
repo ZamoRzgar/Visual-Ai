@@ -127,16 +127,40 @@
                         
                         <div class="mb-5">
                             <h2 class="mb-4">How to Use the Application</h2>
-                            <div class="card border-0 bg-light">
+                            <div class="card border-0 bg-light mb-4">
                                 <div class="card-body p-4">
+                                    <h5 class="mb-3"><i class="fas fa-camera me-2"></i> Using Webcam Capture</h5>
                                     <ol class="mb-0">
-                                        <li class="mb-3">Navigate to the <a href="{% url 'index' %}">Detector page</a></li>
+                                        <li class="mb-3">Navigate to the <a href="{% url 'index' %}">Detector page</a> and select the "Webcam" tab</li>
                                         <li class="mb-3">Click the "Start Webcam" button and grant camera permissions when prompted</li>
                                         <li class="mb-3">Position objects in front of your camera that you want to detect</li>
                                         <li class="mb-3">Click the "Capture & Detect" button to process the current frame</li>
-                                        <li class="mb-3">View the results page showing the processed image with bounding boxes</li>
-                                        <li>Explore the detailed list of detected objects and their confidence scores</li>
+                                        <li>View the results with detected objects and their descriptions</li>
                                     </ol>
+                                </div>
+                            </div>
+                            
+                            <div class="card border-0 bg-light mb-4">
+                                <div class="card-body p-4">
+                                    <h5 class="mb-3"><i class="fas fa-upload me-2"></i> Using Image Upload</h5>
+                                    <ol class="mb-0">
+                                        <li class="mb-3">Navigate to the <a href="{% url 'index' %}">Detector page</a> and select the "Upload Image" tab</li>
+                                        <li class="mb-3">Click the "Select Image" button to choose an image from your device</li>
+                                        <li class="mb-3">Once your image is visible in the preview, click the "Detect Objects" button</li>
+                                        <li>View the results with detected objects and their descriptions</li>
+                                    </ol>
+                                </div>
+                            </div>
+                            
+                            <div class="card border-0 bg-light">
+                                <div class="card-body p-4">
+                                    <h5 class="mb-3"><i class="fas fa-search me-2"></i> Understanding Results</h5>
+                                    <ul class="mb-0">
+                                        <li class="mb-3">The results page shows your image with colored bounding boxes around detected objects</li>
+                                        <li class="mb-3">Each detected object is labeled with its name and confidence score</li>
+                                        <li class="mb-3">A natural language description summarizes what was detected in the image</li>
+                                        <li>Use the "Detect Another Object" button to return to the detector interface</li>
+                                    </ul>
                                 </div>
                             </div>
                         </div>

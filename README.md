@@ -1,10 +1,12 @@
 # Visual AI: Object Detection Application
 
-A modern web application that uses your device's webcam to detect objects in images. The app allows you to capture images, analyzes them using advanced computer vision, and provides detailed descriptions of the objects it detects.
+A modern web application that detects objects in images using advanced computer vision. The app offers two convenient ways to analyze images: capture directly from your webcam or upload existing images from your device. It provides detailed descriptions and visual annotations of the objects it detects.
 
 ## Features
 
-- Webcam-based object detection with an elegant user interface
+- **Dual Input Methods**:
+  - Webcam capture for real-time image analysis
+  - Image upload for analyzing existing photos
 - Utilizes YOLO v8 (You Only Look Once) model for fast and accurate detection
 - Web-based interface with no installation required
 - Displays bounding boxes around detected objects with confidence scores
@@ -63,13 +65,24 @@ This application uses the YOLO v8 model from Ultralytics, which is a state-of-th
 
 ## Usage
 
+### Webcam Method
 1. Navigate to the detector page
-2. Click "Start Webcam" and grant camera permissions when prompted
-3. Position objects in front of your camera that you want to detect
-4. Click the "Capture & Detect" button to process the current frame
-5. View the results page showing the processed image with detection boxes
-6. Explore the detailed list of detected objects and their confidence scores
-7. Click "Detect Another Object" to return to the webcam interface
+2. Select the "Webcam" tab (selected by default)
+3. Click "Start Webcam" and grant camera permissions when prompted
+4. Position objects in front of your camera that you want to detect
+5. Click the "Capture & Detect" button to process the current frame
+
+### Upload Method
+1. Navigate to the detector page
+2. Select the "Upload Image" tab
+3. Click "Select Image" to choose an image from your device
+4. Once your image appears in the preview, click "Detect Objects"
+
+### Results
+- View the processed image with detection boxes highlighting identified objects
+- Explore the detailed list of detected objects and their confidence scores
+- Read the natural language description summarizing what was found
+- Click "Detect Another Object" to return to the detector interface
 
 ## Project Structure
 
