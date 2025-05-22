@@ -1,0 +1,174 @@
+{% extends 'detector/base.html' %}
+{% load static %}
+
+{% block title %}About - Visual AI Object Detection{% endblock %}
+
+{% block content %}
+<!-- About Hero Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8 mx-auto text-center">
+                <h1 class="mb-4">About Visual AI</h1>
+                <p class="lead mb-0">An intelligent object detection application using computer vision</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Main Content -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                <div class="card shadow-lg border-0">
+                    <div class="card-body p-5">
+                        <div class="mb-5">
+                            <h2 class="mb-4">Project Overview</h2>
+                            <p class="lead">Visual AI is a web-based object detection application that uses your device's webcam to identify objects in real-time.</p>
+                            <p>This application allows you to capture images through your webcam and uses advanced computer vision algorithms to detect various objects, providing detailed descriptions and confidence scores. Whether you're curious about what objects can be detected or looking to explore computer vision capabilities, our application offers an intuitive and interactive experience.</p>
+                        </div>
+                        
+                        <div class="mb-5">
+                            <h2 class="mb-4">Technology Stack</h2>
+                            <div class="row g-4">
+                                <div class="col-md-4">
+                                    <div class="card h-100 border-0 shadow-sm">
+                                        <div class="card-body">
+                                            <div class="feature-icon mb-3">
+                                                <i class="fas fa-server"></i>
+                                            </div>
+                                            <h4>Backend</h4>
+                                            <ul class="list-unstyled">
+                                                <li><i class="fas fa-check-circle text-success me-2"></i> Django</li>
+                                                <li><i class="fas fa-check-circle text-success me-2"></i> Python</li>
+                                                <li><i class="fas fa-check-circle text-success me-2"></i> OpenCV</li>
+                                                <li><i class="fas fa-check-circle text-success me-2"></i> YOLO v8</li>
+                                                <li><i class="fas fa-check-circle text-success me-2"></i> NumPy</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card h-100 border-0 shadow-sm">
+                                        <div class="card-body">
+                                            <div class="feature-icon mb-3">
+                                                <i class="fas fa-desktop"></i>
+                                            </div>
+                                            <h4>Frontend</h4>
+                                            <ul class="list-unstyled">
+                                                <li><i class="fas fa-check-circle text-success me-2"></i> HTML5</li>
+                                                <li><i class="fas fa-check-circle text-success me-2"></i> CSS3</li>
+                                                <li><i class="fas fa-check-circle text-success me-2"></i> JavaScript</li>
+                                                <li><i class="fas fa-check-circle text-success me-2"></i> Bootstrap 5</li>
+                                                <li><i class="fas fa-check-circle text-success me-2"></i> WebRTC</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card h-100 border-0 shadow-sm">
+                                        <div class="card-body">
+                                            <div class="feature-icon mb-3">
+                                                <i class="fas fa-cogs"></i>
+                                            </div>
+                                            <h4>Features</h4>
+                                            <ul class="list-unstyled">
+                                                <li><i class="fas fa-check-circle text-success me-2"></i> Real-time Webcam Access</li>
+                                                <li><i class="fas fa-check-circle text-success me-2"></i> Object Detection</li>
+                                                <li><i class="fas fa-check-circle text-success me-2"></i> Natural Language Descriptions</li>
+                                                <li><i class="fas fa-check-circle text-success me-2"></i> Confidence Scores</li>
+                                                <li><i class="fas fa-check-circle text-success me-2"></i> Visual Bounding Boxes</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-5">
+                            <h2 class="mb-4">How the Application Works</h2>
+                            <p>Our object detection system employs the YOLO (You Only Look Once) v8 model, a state-of-the-art real-time object detection system. Here's how it works:</p>
+                            <div class="row mt-4">
+                                <div class="col-md-6">
+                                    <div class="card border-0 bg-light h-100">
+                                        <div class="card-body p-4">
+                                            <h5 class="mb-3"><i class="fas fa-camera me-2"></i> Image Capture</h5>
+                                            <p>The application accesses your device's webcam through the browser using WebRTC technology. When you click the "Capture & Detect" button, the current frame is captured and sent to the server for processing.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card border-0 bg-light h-100">
+                                        <div class="card-body p-4">
+                                            <h5 class="mb-3"><i class="fas fa-brain me-2"></i> Object Detection</h5>
+                                            <p>The YOLO v8 model analyzes the image to identify objects from 80+ categories including people, animals, vehicles, and everyday items. The model assigns confidence scores to each detection.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mt-4">
+                                    <div class="card border-0 bg-light h-100">
+                                        <div class="card-body p-4">
+                                            <h5 class="mb-3"><i class="fas fa-border-all me-2"></i> Visualization</h5>
+                                            <p>The application draws bounding boxes around detected objects and labels them with the object name and confidence score, creating a visual representation of what the AI has detected.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mt-4">
+                                    <div class="card border-0 bg-light h-100">
+                                        <div class="card-body p-4">
+                                            <h5 class="mb-3"><i class="fas fa-file-alt me-2"></i> Description Generation</h5>
+                                            <p>Based on the detected objects, the system generates a natural language description summarizing what was found in the image, providing an easily understandable overview.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-5">
+                            <h2 class="mb-4">How to Use the Application</h2>
+                            <div class="card border-0 bg-light">
+                                <div class="card-body p-4">
+                                    <ol class="mb-0">
+                                        <li class="mb-3">Navigate to the <a href="{% url 'index' %}">Detector page</a></li>
+                                        <li class="mb-3">Click the "Start Webcam" button and grant camera permissions when prompted</li>
+                                        <li class="mb-3">Position objects in front of your camera that you want to detect</li>
+                                        <li class="mb-3">Click the "Capture & Detect" button to process the current frame</li>
+                                        <li class="mb-3">View the results page showing the processed image with bounding boxes</li>
+                                        <li>Explore the detailed list of detected objects and their confidence scores</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h2 class="mb-4">Privacy & Security</h2>
+                            <p>At Visual AI, we take your privacy seriously:</p>
+                            <ul>
+                                <li>All image processing occurs locally on our server</li>
+                                <li>No images or detection data are stored permanently</li>
+                                <li>No personal information is collected during the detection process</li>
+                                <li>We do not share any data with third parties</li>
+                            </ul>
+                            <p class="mt-3">This application is designed for educational and demonstration purposes to showcase the capabilities of modern computer vision technology.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <h2 class="mb-4">Ready to try object detection?</h2>
+                <p class="lead mb-4">Experience the power of computer vision with our easy-to-use detector.</p>
+                <a href="{% url 'index' %}" class="btn btn-primary btn-lg"><i class="fas fa-camera me-2"></i> Try It Now</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

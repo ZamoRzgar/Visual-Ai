@@ -1,0 +1,181 @@
+{% extends 'detector/base.html' %}
+{% load static %}
+
+{% block title %}Object Detection with Webcam{% endblock %}
+
+{% block extra_css %}
+<style>
+    #video-container {
+        position: relative;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    #webcam, #capture-image, #processed-image {
+        width: 100%;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    #description {
+        margin-top: 20px;
+        padding: 15px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        border-left: 4px solid #0d6efd;
+    }
+    .control-panel {
+        margin: 20px 0;
+        padding: 15px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+    }
+    .detection-info {
+        margin-top: 20px;
+    }
+    #canvas {
+        display: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto text-center">
+        <h1 class="mb-4">Object Detection with Webcam</h1>
+        <p class="lead">Hold an object in front of your webcam, capture an image, and the app will detect and describe it.</p>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-lg-8 mx-auto">
+        <div class="card shadow">
+            <div class="card-body">
+                <div id="video-container">
+                    <video id="webcam" autoplay playsinline></video>
+                    <canvas id="canvas"></canvas>
+                    <img id="processed-image" src="" alt="Processed Image" style="display: none;">
+                </div>
+                
+                <div class="control-panel">
+                    <div class="d-flex justify-content-between">
+                        <button id="start-btn" class="btn btn-primary">Start Webcam</button>
+                        <button id="capture-btn" class="btn btn-success" disabled>Capture & Detect</button>
+                        <button id="stop-btn" class="btn btn-danger" disabled>Stop</button>
+                    </div>
+                </div>
+                
+                <form id="detection-form" method="post" action="{% url 'detect_objects' %}" style="display: none;">
+                    {% csrf_token %}
+                    <input type="hidden" name="image_data" id="image-data">
+                </form>
+                
+                <div id="description" class="description">
+                    <h5>Description:</h5>
+                    <p id="object-description">Start the webcam and capture an image to detect objects.</p>
+                </div>
+                
+                <div class="detection-info">
+                    <h5>Detected Objects:</h5>
+                    <ul id="detections-list" class="list-group">
+                        <li class="list-group-item text-center">No objects detected yet</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const webcamElement = document.getElementById('webcam');
+    const canvasElement = document.getElementById('canvas');
+    const processedImageElement = document.getElementById('processed-image');
+    const startButton = document.getElementById('start-btn');
+    const captureButton = document.getElementById('capture-btn');
+    const stopButton = document.getElementById('stop-btn');
+    const objectDescriptionElement = document.getElementById('object-description');
+    const detectionsListElement = document.getElementById('detections-list');
+    const imageDataInput = document.getElementById('image-data');
+    const detectionForm = document.getElementById('detection-form');
+    
+    let stream = null;
+    
+    // Event listeners
+    startButton.addEventListener('click', startWebcam);
+    captureButton.addEventListener('click', captureAndDetect);
+    stopButton.addEventListener('click', stopWebcam);
+    
+    // Start webcam
+    async function startWebcam() {
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({ 
+                video: { 
+                    width: { ideal: 640 },
+                    height: { ideal: 480 },
+                    facingMode: 'environment' // Prefer back camera if available
+                } 
+            });
+            
+            webcamElement.srcObject = stream;
+            webcamElement.style.display = 'block';
+            processedImageElement.style.display = 'none';
+            
+            startButton.disabled = true;
+            captureButton.disabled = false;
+            stopButton.disabled = false;
+            
+            objectDescriptionElement.textContent = 'Webcam started. Capture an image to detect objects.';
+            
+        } catch (error) {
+            console.error('Error accessing webcam:', error);
+            objectDescriptionElement.textContent = 'Error accessing webcam. Please ensure you have a webcam connected and you\'ve granted permission to use it.';
+        }
+    }
+    
+    // Capture image and submit for detection
+    function captureAndDetect() {
+        if (!stream) return;
+        
+        try {
+            // Set canvas dimensions to match video
+            canvasElement.width = webcamElement.videoWidth;
+            canvasElement.height = webcamElement.videoHeight;
+            
+            // Draw current frame to canvas
+            const ctx = canvasElement.getContext('2d');
+            ctx.drawImage(webcamElement, 0, 0, canvasElement.width, canvasElement.height);
+            
+            // Get image data
+            const imageData = canvasElement.toDataURL('image/jpeg');
+            imageDataInput.value = imageData;
+            
+            // Submit form for processing
+            objectDescriptionElement.textContent = 'Processing image...';
+            detectionForm.submit();
+            
+        } catch (error) {
+            console.error('Error capturing image:', error);
+            objectDescriptionElement.textContent = 'Error capturing image. Please try again.';
+        }
+    }
+    
+    // Stop webcam
+    function stopWebcam() {
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+            stream = null;
+        }
+        
+        webcamElement.srcObject = null;
+        processedImageElement.src = '';
+        objectDescriptionElement.textContent = 'Start the webcam to detect objects.';
+        detectionsListElement.innerHTML = '<li class="list-group-item text-center">No objects detected yet</li>';
+        
+        startButton.disabled = false;
+        captureButton.disabled = true;
+        stopButton.disabled = true;
+    }
+});
+</script>
+{% endblock %}

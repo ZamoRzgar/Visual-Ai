@@ -1,0 +1,122 @@
+{% extends 'detector/base.html' %}
+{% load static %}
+
+{% block title %}Visual AI - Smart Object Detection{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8 mx-auto text-center hero-content">
+                <h1 class="mb-4">Detect Objects with AI Precision</h1>
+                <p class="lead mb-5">Our advanced computer vision technology identifies objects in real-time using state-of-the-art YOLO model and provides detailed analysis.</p>
+                <div class="d-flex justify-content-center flex-wrap">
+                    <a href="{% url 'index' %}" class="btn btn-primary me-3 mb-3"><i class="fas fa-camera me-2"></i>Try It Now</a>
+                    <a href="{% url 'about' %}" class="btn btn-outline-primary mb-3"><i class="fas fa-info-circle me-2"></i>Learn More</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-5 my-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2>Powerful Features</h2>
+            <p class="lead">Experience the future of object detection with our cutting-edge technology</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-camera"></i>
+                    </div>
+                    <h3>Real-time Detection</h3>
+                    <p>Analyze objects through your webcam with instant feedback and high accuracy detection.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3>AI-Powered Analysis</h3>
+                    <p>Utilizing YOLO v8, our system can recognize 80+ different object types with remarkable precision.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-comment-alt"></i>
+                    </div>
+                    <h3>Natural Language Descriptions</h3>
+                    <p>Get detailed descriptions of detected objects in natural language that's easy to understand.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2>How It Works</h2>
+            <p class="lead">Simple steps to detect and analyze objects with our application</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <div class="display-4 mb-3 text-primary">1</div>
+                        <h4>Start Your Webcam</h4>
+                        <p>Launch the app and grant permission to access your device's camera.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <div class="display-4 mb-3 text-primary">2</div>
+                        <h4>Capture an Image</h4>
+                        <p>Position objects in front of your camera and capture an image when ready.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <div class="display-4 mb-3 text-primary">3</div>
+                        <h4>View Analysis</h4>
+                        <p>Review the detected objects, their descriptions, and confidence scores.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="text-center mt-5">
+            <a href="{% url 'index' %}" class="btn btn-primary btn-lg">Try It Yourself</a>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-5 my-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="card">
+                    <div class="card-body text-center py-5">
+                        <h2 class="mb-4">Ready to experience AI vision?</h2>
+                        <p class="lead mb-4">Our object detection system is ready to analyze your environment with just a few clicks.</p>
+                        <a href="{% url 'index' %}" class="btn btn-primary btn-lg">Start Detecting Now</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

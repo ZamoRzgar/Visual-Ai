@@ -1,0 +1,121 @@
+{% extends 'detector/base.html' %}
+{% load static %}
+
+{% block title %}Detection Results - Visual AI{% endblock %}
+
+{% block extra_css %}
+<style>
+    .result-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    .processed-image {
+        width: 100%;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        margin-bottom: 30px;
+        display: block; /* Ensure image is displayed */
+    }
+    .description-box {
+        margin-top: 30px;
+        padding: 25px;
+        background-color: #f8f9fa;
+        border-radius: 12px;
+        border-left: 5px solid #6c5ce7;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    }
+    .detection-info {
+        margin-top: 30px;
+    }
+    .confidence-badge {
+        float: right;
+    }
+    .object-card {
+        transition: all 0.3s ease;
+        margin-bottom: 10px;
+    }
+    .object-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Results Hero Section -->
+<section class="py-4 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <h1 class="mb-3">Detection Results</h1>
+                <p class="lead">See what Visual AI has discovered in your image</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Results Content -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                <div class="card shadow-lg border-0">
+                    <div class="card-body p-md-5">
+                        {% if error %}
+                        <div class="alert alert-danger">
+                            {{ error }}
+                        </div>
+                        {% endif %}
+                        
+                        <div class="result-container">
+                            <!-- Debug info -->
+                            {% if processed_image %}
+                                <img src="{{ processed_image }}" alt="Processed Image" class="processed-image">
+                            {% else %}
+                                <div class="alert alert-warning mb-4">
+                                    <i class="fas fa-exclamation-triangle me-2"></i> No processed image data available.
+                                </div>
+                            {% endif %}
+                            
+                            <div class="description-box">
+                                <h3 class="mb-3"><i class="fas fa-comment-alt me-2"></i> Analysis</h3>
+                                <p class="lead">{{ description }}</p>
+                            </div>
+                            
+                            <div class="detection-info mt-4">
+                                <h3 class="mb-4"><i class="fas fa-search me-2"></i> Detected Objects</h3>
+                                {% if detections %}
+                                    <div class="row">
+                                    {% for detection in detections %}
+                                        <div class="col-md-6 mb-3">
+                                            <div class="card object-card h-100">
+                                                <div class="card-body">
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <h5 class="mb-0">{{ detection.name|title }}</h5>
+                                                        <span class="badge bg-primary rounded-pill">{{ detection.confidence|floatformat:2 }}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-info-circle me-2"></i> No objects were detected in this image.
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="text-center mt-5">
+                                <a href="{% url 'index' %}" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-camera me-2"></i> Detect Another Object
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
