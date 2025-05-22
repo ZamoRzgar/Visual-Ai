@@ -148,14 +148,25 @@ h2 {
 }
 
 /* Landing page specific */
+.landing-page-wrapper {
+  position: relative;
+  overflow: hidden;
+  background-color: #f8fafc;
+  min-height: 100vh;
+}
+
 .hero-section {
   position: relative;
   padding: 8rem 0;
-  overflow: hidden;
-  background-color: #f8fafc;
+  overflow: visible;
 }
 
 .hero-content {
+  position: relative;
+  z-index: 10;
+}
+
+.landing-content {
   position: relative;
   z-index: 10;
 }
@@ -173,29 +184,39 @@ h2 {
 }
 
 .blob {
-  position: absolute;
-  width: 500px;
-  height: 500px;
+  position: fixed;
+  width: 800px;
+  height: 800px;
   background: linear-gradient(180deg, rgba(99, 102, 241, 0.3) 0%, rgba(99, 102, 241, 0.1) 100%);
   border-radius: 43% 57% 70% 30% / 30% 43% 57% 70%;
   transform: rotate(0deg);
   transition: all 1s ease-in-out;
-  opacity: 0.7;
+  opacity: 0.6;
   z-index: 1;
-  filter: blur(20px);
-  animation: blob-animation 20s infinite alternate;
+  filter: blur(30px);
+  animation: blob-animation 25s infinite alternate;
 }
 
 .blob-1 {
-  top: -200px;
-  right: -100px;
+  top: -300px;
+  right: -200px;
 }
 
 .blob-2 {
-  bottom: -200px;
-  left: -100px;
+  bottom: -300px;
+  left: -200px;
   background: linear-gradient(180deg, rgba(236, 72, 153, 0.3) 0%, rgba(236, 72, 153, 0.1) 100%);
   animation-delay: 5s;
+}
+
+.blob-3 {
+  top: 40%;
+  left: 30%;
+  width: 600px;
+  height: 600px;
+  background: linear-gradient(180deg, rgba(20, 184, 166, 0.2) 0%, rgba(20, 184, 166, 0.05) 100%);
+  animation-delay: 8s;
+  animation-duration: 30s;
 }
 
 @keyframes blob-animation {
