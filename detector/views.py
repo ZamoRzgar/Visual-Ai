@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse, HttpResponse, StreamingHttpResponse
 from ultralytics import YOLO
 import os
 import threading
@@ -8,6 +8,9 @@ import json
 import base64
 import numpy as np
 import cv2
+import mediapipe as mp
+import time
+import math
 from io import BytesIO
 
 # Load YOLO model globally
@@ -190,3 +193,8 @@ def generate_description(detections):
                   f"({most_confident['confidence']:.1f}% sure)."
     
     return description
+
+
+def air_painter(request):
+    """Render the air painter page"""
+    return render(request, 'detector/air_painter.html')

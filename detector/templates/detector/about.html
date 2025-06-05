@@ -44,6 +44,7 @@
                                                 <li><i class="fas fa-check-circle text-success me-2"></i> Python</li>
                                                 <li><i class="fas fa-check-circle text-success me-2"></i> OpenCV</li>
                                                 <li><i class="fas fa-check-circle text-success me-2"></i> YOLO v8</li>
+                                                <li><i class="fas fa-check-circle text-success me-2"></i> MediaPipe</li>
                                                 <li><i class="fas fa-check-circle text-success me-2"></i> NumPy</li>
                                             </ul>
                                         </div>
@@ -76,6 +77,7 @@
                                             <ul class="list-unstyled">
                                                 <li><i class="fas fa-check-circle text-success me-2"></i> Real-time Webcam Access</li>
                                                 <li><i class="fas fa-check-circle text-success me-2"></i> Object Detection</li>
+                                                <li><i class="fas fa-check-circle text-success me-2"></i> Air Painter with Hand Tracking</li>
                                                 <li><i class="fas fa-check-circle text-success me-2"></i> Natural Language Descriptions</li>
                                                 <li><i class="fas fa-check-circle text-success me-2"></i> Confidence Scores</li>
                                                 <li><i class="fas fa-check-circle text-success me-2"></i> Visual Bounding Boxes</li>
@@ -148,6 +150,20 @@
                                         <li class="mb-3">Click the "Select Image" button to choose an image from your device</li>
                                         <li class="mb-3">Once your image is visible in the preview, click the "Detect Objects" button</li>
                                         <li>View the results with detected objects and their descriptions</li>
+                                    </ol>
+                                </div>
+                            </div>
+                            
+                            <div class="card border-0 bg-light mb-4">
+                                <div class="card-body p-4">
+                                    <h5 class="mb-3"><i class="fas fa-paint-brush me-2"></i> Using Air Painter</h5>
+                                    <ol class="mb-0">
+                                        <li class="mb-3">Navigate to the <a href="{% url 'air_painter' %}">Air Painter page</a></li>
+                                        <li class="mb-3">Click the "Start Camera" button and grant camera permissions when prompted</li>
+                                        <li class="mb-3">Raise your index finger to draw in the air (keep it higher than your middle finger)</li>
+                                        <li class="mb-3">Lower your index finger below your middle finger to stop drawing</li>
+                                        <li class="mb-3">Use the buttons to change colors, drawing modes (draw, rectangle, star, heart), and brush size</li>
+                                        <li>Click "Save Drawing" to download your creation as an image</li>
                                     </ol>
                                 </div>
                             </div>

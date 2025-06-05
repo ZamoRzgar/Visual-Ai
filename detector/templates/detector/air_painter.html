@@ -1,0 +1,583 @@
+{% extends 'detector/base.html' %}
+{% load static %}
+
+{% block title %}Visual AI - Air Painter{% endblock %}
+
+{% block extra_css %}
+<style>
+    .air-painter-container {
+        position: relative;
+        width: 100%;
+        max-width: 1280px;
+        margin: 0 auto;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    #video-container {
+        position: relative;
+        width: 100%;
+        height: 0;
+        padding-bottom: 56.25%; /* 16:9 aspect ratio */
+        background-color: #000;
+    }
+    
+    #videoElement {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #000;
+        object-fit: cover;
+    }
+    
+    #canvasElement {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 10;
+    }
+    
+    .controls {
+        padding: 20px;
+        background-color: #f8f9fa;
+        border-bottom-left-radius: 10px;
+        border-bottom-right-radius: 10px;
+    }
+    
+    .color-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        margin-right: 10px;
+        cursor: pointer;
+        border: 2px solid #fff;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+    
+    .color-btn.active {
+        border: 3px solid #000;
+    }
+    
+    .instructions {
+        background-color: rgba(0, 0, 0, 0.7);
+        color: white;
+        position: absolute;
+        bottom: 20px;
+        left: 20px;
+        right: 20px;
+        padding: 10px;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-5 fw-bold text-center mb-4">Air Painter</h1>
+            <p class="lead text-center mb-5">Use your index finger to draw in the air! Select colors and shapes from the controls below.</p>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <div class="air-painter-container">
+                <div id="video-container" style="position: relative;">
+                    <video id="videoElement" autoplay playsinline></video>
+                    <canvas id="canvasElement" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></canvas>
+                    <div class="instructions">
+                        <p class="mb-1"><strong>Instructions:</strong></p>
+                        <p class="mb-1">• Raise your index finger to draw</p>
+                        <p class="mb-1">• Lower your index finger below your middle finger to stop drawing</p>
+                        <p class="mb-0">• Move your hand to the color buttons at the top to change colors</p>
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <button id="startBtn" class="btn btn-primary">Start Camera</button>
+                            <button id="clearBtn" class="btn btn-outline-secondary ms-2">Clear Canvas</button>
+                            <button id="saveBtn" class="btn btn-success ms-2">Save Drawing</button>
+                        </div>
+                        <div>
+                            <span id="currentMode" class="badge bg-dark">Mode: Draw</span>
+                            <span id="currentColor" class="badge bg-primary ms-2">Color: Purple</span>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="me-3">Drawing Mode:</div>
+                        <div class="btn-group" role="group">
+                            <button id="drawMode" class="btn btn-sm btn-outline-primary active">Draw</button>
+                            <button id="rectangleMode" class="btn btn-sm btn-outline-primary">Rectangle</button>
+                            <button id="starMode" class="btn btn-sm btn-outline-primary">Star</button>
+                            <button id="heartMode" class="btn btn-sm btn-outline-primary">Heart</button>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">Colors:</div>
+                        <div class="d-flex">
+                            <div class="color-btn active" style="background-color: #ff00ff;" data-color="purple"></div>
+                            <div class="color-btn" style="background-color: #0000ff;" data-color="blue"></div>
+                            <div class="color-btn" style="background-color: #00ff00;" data-color="green"></div>
+                            <div class="color-btn" style="background-color: #ff0000;" data-color="red"></div>
+                            <div class="color-btn" style="background-color: #000000;" data-color="eraser"></div>
+                        </div>
+                        
+                        <div class="ms-4">
+                            <label for="brushSize" class="form-label me-2">Brush Size:</label>
+                            <input type="range" class="form-range" min="5" max="50" value="10" id="brushSize" style="width: 150px;">
+                            <span id="brushSizeValue">10px</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Updated MediaPipe imports to latest versions -->
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+
+<script>
+    // DOM Elements
+    const videoElement = document.getElementById('videoElement');
+    const canvasElement = document.getElementById('canvasElement');
+    const startBtn = document.getElementById('startBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const saveBtn = document.getElementById('saveBtn');
+    const drawMode = document.getElementById('drawMode');
+    const rectangleMode = document.getElementById('rectangleMode');
+    const starMode = document.getElementById('starMode');
+    const heartMode = document.getElementById('heartMode');
+    const brushSizeInput = document.getElementById('brushSize');
+    const brushSizeValue = document.getElementById('brushSizeValue');
+    const currentMode = document.getElementById('currentMode');
+    const currentColor = document.getElementById('currentColor');
+    const colorBtns = document.querySelectorAll('.color-btn');
+    
+    // Canvas setup
+    const ctx = canvasElement.getContext('2d');
+    let drawingCanvas;
+    let drawingCtx;
+    
+    // Drawing variables
+    let mode = 'draw';
+    let drawColor = [255, 0, 255]; // Purple in BGR
+    let colorName = 'Purple';
+    let brushThickness = 10;
+    let eraserThickness = 50;
+    let xp = 0;
+    let yp = 0;
+    let isDrawing = false;
+    
+    // Initialize MediaPipe Hands
+    const hands = new Hands({
+        locateFile: (file) => {
+            return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
+        }
+    });
+    
+    hands.setOptions({
+        maxNumHands: 1,
+        modelComplexity: 1,
+        minDetectionConfidence: 0.5,
+        minTrackingConfidence: 0.5
+    });
+    
+    hands.onResults(processResults);
+    
+    // Camera setup
+    let camera;
+    let cameraActive = false;
+    
+    // Initialize the app
+    function init() {
+        // Set canvas size to match video container
+        const videoContainer = document.getElementById('video-container');
+        const containerWidth = videoContainer.clientWidth;
+        const containerHeight = containerWidth * (9/16); // 16:9 aspect ratio
+        
+        canvasElement.width = containerWidth;
+        canvasElement.height = containerHeight;
+        
+        // Create drawing canvas
+        drawingCanvas = document.createElement('canvas');
+        drawingCanvas.width = canvasElement.width;
+        drawingCanvas.height = canvasElement.height;
+        drawingCtx = drawingCanvas.getContext('2d');
+        drawingCtx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
+        
+        // Clear the main canvas
+        ctx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+        
+        // Event listeners
+        startBtn.addEventListener('click', toggleCamera);
+        clearBtn.addEventListener('click', clearCanvas);
+        saveBtn.addEventListener('click', saveDrawing);
+        drawMode.addEventListener('click', () => setMode('draw'));
+        rectangleMode.addEventListener('click', () => setMode('rectangle'));
+        starMode.addEventListener('click', () => setMode('star'));
+        heartMode.addEventListener('click', () => setMode('heart'));
+        
+        // Add resize event listener
+        window.addEventListener('resize', resizeCanvas);
+        
+        brushSizeInput.addEventListener('input', () => {
+            brushThickness = parseInt(brushSizeInput.value);
+            brushSizeValue.textContent = `${brushThickness}px`;
+        });
+        
+        colorBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Remove active class from all buttons
+                colorBtns.forEach(b => b.classList.remove('active'));
+                // Add active class to clicked button
+                btn.classList.add('active');
+                
+                const colorType = btn.getAttribute('data-color');
+                switch(colorType) {
+                    case 'purple':
+                        drawColor = [255, 0, 255];
+                        colorName = 'Purple';
+                        break;
+                    case 'blue':
+                        drawColor = [255, 0, 0];
+                        colorName = 'Blue';
+                        break;
+                    case 'green':
+                        drawColor = [0, 255, 0];
+                        colorName = 'Green';
+                        break;
+                    case 'red':
+                        drawColor = [0, 0, 255];
+                        colorName = 'Red';
+                        break;
+                    case 'eraser':
+                        drawColor = [0, 0, 0];
+                        colorName = 'Eraser';
+                        break;
+                }
+                currentColor.textContent = `Color: ${colorName}`;
+            });
+        });
+    }
+    
+    // Toggle camera on/off
+    function toggleCamera() {
+        if (cameraActive) {
+            // Stop the camera
+            try {
+                if (camera && typeof camera.stop === 'function') {
+                    camera.stop();
+                }
+                
+                // Stop any active stream
+                if (videoElement.srcObject) {
+                    const tracks = videoElement.srcObject.getTracks();
+                    tracks.forEach(track => track.stop());
+                    videoElement.srcObject = null;
+                }
+                
+                startBtn.textContent = 'Start Camera';
+                cameraActive = false;
+                console.log('Camera stopped');
+            } catch (err) {
+                console.error('Error stopping camera:', err);
+            }
+        } else {
+            // Start the camera
+            startCamera();
+            startBtn.textContent = 'Stop Camera';
+            cameraActive = true;
+            console.log('Camera started');
+        }
+    }
+    
+    // Start the camera
+    function startCamera() {
+        try {
+            if (typeof Camera !== 'undefined') {
+                try {
+                    camera = new Camera(videoElement, {
+                        onFrame: async () => {
+                            await hands.send({image: videoElement});
+                        },
+                        width: canvasElement.width,
+                        height: canvasElement.height
+                    });
+                    camera.start();
+                    console.log('MediaPipe Camera started');
+                } catch (err) {
+                    console.error('Error starting MediaPipe Camera:', err);
+                    useNativeCamera();
+                }
+            } else {
+                console.log('MediaPipe Camera API not available, using native getUserMedia');
+                useNativeCamera();
+            }
+        } catch (err) {
+            console.error('Camera initialization error:', err);
+            alert('Error initializing camera. Please make sure you have granted camera permissions.');
+        }
+    }
+    
+    // Use native getUserMedia as fallback
+    function useNativeCamera() {
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices.getUserMedia({ 
+                video: { 
+                    width: { ideal: canvasElement.width },
+                    height: { ideal: canvasElement.height }
+                } 
+            })
+            .then(function(stream) {
+                videoElement.srcObject = stream;
+                videoElement.onloadedmetadata = function() {
+                    videoElement.play();
+                };
+                
+                // Set up a frame processing loop for hand detection
+                const processFrame = async () => {
+                    if (videoElement.readyState >= 2) {
+                        try {
+                            await hands.send({image: videoElement});
+                        } catch (err) {
+                            console.error('Error in hand detection:', err);
+                        }
+                    }
+                    if (cameraActive) {
+                        requestAnimationFrame(processFrame);
+                    }
+                };
+                requestAnimationFrame(processFrame);
+            })
+            .catch(function(error) {
+                console.error('Error accessing the camera:', error);
+                alert('Error accessing the camera: ' + error.message);
+            });
+        } else {
+            alert('Your browser does not support camera access');
+        }
+    }
+    
+    // Process hand detection results
+    function processResults(results) {
+        // Clear the canvas for new frame
+        ctx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+        
+        // Draw the video frame
+        ctx.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
+        
+        // Draw the current drawing on top of the video
+        ctx.drawImage(drawingCanvas, 0, 0);
+        
+        if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+            const landmarks = results.multiHandLandmarks[0];
+            
+            // Get index and middle finger positions
+            const indexFinger = landmarks[8];
+            const middleFinger = landmarks[12];
+            
+            // Convert to canvas coordinates
+            const x1 = Math.floor(indexFinger.x * canvasElement.width);
+            const y1 = Math.floor(indexFinger.y * canvasElement.height);
+            const x2 = Math.floor(middleFinger.x * canvasElement.width);
+            const y2 = Math.floor(middleFinger.y * canvasElement.height);
+            
+            // Check if index finger is raised (drawing mode)
+            const fingersUp = y1 < y2;
+            
+            // Draw circle at index finger tip
+            ctx.beginPath();
+            ctx.arc(x1, y1, 10, 0, 2 * Math.PI);
+            ctx.fillStyle = `rgb(${drawColor[2]}, ${drawColor[1]}, ${drawColor[0]})`;
+            ctx.fill();
+            
+            if (fingersUp) {
+                // Drawing mode
+                if (mode === 'draw') {
+                    if (xp === 0 && yp === 0) {
+                        xp = x1;
+                        yp = y1;
+                    }
+                    
+                    drawingCtx.beginPath();
+                    drawingCtx.moveTo(xp, yp);
+                    drawingCtx.lineTo(x1, y1);
+                    drawingCtx.strokeStyle = `rgb(${drawColor[2]}, ${drawColor[1]}, ${drawColor[0]})`;
+                    drawingCtx.lineWidth = colorName === 'Eraser' ? eraserThickness : brushThickness;
+                    drawingCtx.lineCap = 'round';
+                    drawingCtx.stroke();
+                    
+                    xp = x1;
+                    yp = y1;
+                } else if (mode === 'rectangle') {
+                    if (!isDrawing) {
+                        // Draw a rectangle at current position
+                        drawingCtx.strokeStyle = `rgb(${drawColor[2]}, ${drawColor[1]}, ${drawColor[0]})`;
+                        drawingCtx.lineWidth = 3;
+                        drawingCtx.strokeRect(x1 - 60, y1 - 40, 120, 80);
+                    }
+                } else if (mode === 'star') {
+                    if (!isDrawing) {
+                        drawStar(x1, y1, 50);
+                    }
+                } else if (mode === 'heart') {
+                    if (!isDrawing) {
+                        drawHeart(x1, y1, 1);
+                    }
+                }
+                isDrawing = true;
+            } else {
+                // Not drawing
+                xp = 0;
+                yp = 0;
+                isDrawing = false;
+            }
+            
+            // Draw hand landmarks
+            drawConnectors(ctx, landmarks, HAND_CONNECTIONS, {color: '#00FF00', lineWidth: 5});
+            drawLandmarks(ctx, landmarks, {color: '#FF0000', lineWidth: 2});
+        }
+        
+        // Combine drawing canvas with video canvas
+        ctx.drawImage(drawingCanvas, 0, 0);
+    }
+    
+    // Draw a star
+    function drawStar(cx, cy, size) {
+        const points = [];
+        for (let i = 0; i < 5; i++) {
+            const outerAngle = i * 2 * Math.PI / 5 - Math.PI / 2;
+            const innerAngle = outerAngle + Math.PI / 5;
+            
+            const outerX = cx + size * Math.cos(outerAngle);
+            const outerY = cy + size * Math.sin(outerAngle);
+            const innerX = cx + (size / 2) * Math.cos(innerAngle);
+            const innerY = cy + (size / 2) * Math.sin(innerAngle);
+            
+            points.push(outerX, outerY, innerX, innerY);
+        }
+        
+        drawingCtx.beginPath();
+        drawingCtx.moveTo(points[0], points[1]);
+        for (let i = 2; i < points.length; i += 2) {
+            drawingCtx.lineTo(points[i], points[i + 1]);
+        }
+        drawingCtx.closePath();
+        drawingCtx.strokeStyle = `rgb(${drawColor[2]}, ${drawColor[1]}, ${drawColor[0]})`;
+        drawingCtx.lineWidth = 3;
+        drawingCtx.stroke();
+    }
+    
+    // Draw a heart
+    function drawHeart(cx, cy, size) {
+        const t = [];
+        for (let i = 0; i < 100; i++) {
+            t.push(i * 2 * Math.PI / 100);
+        }
+        
+        const x = [];
+        const y = [];
+        
+        for (let i = 0; i < t.length; i++) {
+            x.push(size * 16 * Math.pow(Math.sin(t[i]), 3));
+            y.push(-size * (13 * Math.cos(t[i]) - 5 * Math.cos(2 * t[i]) - 
+                  2 * Math.cos(3 * t[i]) - Math.cos(4 * t[i])));
+        }
+        
+        drawingCtx.beginPath();
+        drawingCtx.moveTo(cx + x[0], cy + y[0]);
+        for (let i = 1; i < x.length; i++) {
+            drawingCtx.lineTo(cx + x[i], cy + y[i]);
+        }
+        drawingCtx.closePath();
+        drawingCtx.strokeStyle = `rgb(${drawColor[2]}, ${drawColor[1]}, ${drawColor[0]})`;
+        drawingCtx.lineWidth = 3;
+        drawingCtx.stroke();
+    }
+    
+    // Set the drawing mode
+    function setMode(newMode) {
+        mode = newMode;
+        currentMode.textContent = `Mode: ${newMode.charAt(0).toUpperCase() + newMode.slice(1)}`;
+        
+        // Update active button
+        document.querySelectorAll('.btn-group .btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        switch(newMode) {
+            case 'draw':
+                drawMode.classList.add('active');
+                break;
+            case 'rectangle':
+                rectangleMode.classList.add('active');
+                break;
+            case 'star':
+                starMode.classList.add('active');
+                break;
+            case 'heart':
+                heartMode.classList.add('active');
+                break;
+        }
+    }
+    
+    // Clear the canvas
+    function clearCanvas() {
+        drawingCtx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
+        ctx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+        if (videoElement.readyState >= 2) {
+            ctx.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
+        }
+    }
+    
+    // Save the drawing
+    function saveDrawing() {
+        const link = document.createElement('a');
+        link.download = 'air-painting.png';
+        link.href = drawingCanvas.toDataURL();
+        link.click();
+    }
+    
+    // Resize canvas when window is resized
+    function resizeCanvas() {
+        const videoContainer = document.getElementById('video-container');
+        const containerWidth = videoContainer.clientWidth;
+        const containerHeight = containerWidth * (9/16); // 16:9 aspect ratio
+        
+        // Create a temporary canvas to save the current drawing
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = drawingCanvas.width;
+        tempCanvas.height = drawingCanvas.height;
+        const tempCtx = tempCanvas.getContext('2d');
+        tempCtx.drawImage(drawingCanvas, 0, 0);
+        
+        // Resize the canvases
+        canvasElement.width = containerWidth;
+        canvasElement.height = containerHeight;
+        drawingCanvas.width = containerWidth;
+        drawingCanvas.height = containerHeight;
+        
+        // Restore the drawing
+        drawingCtx.drawImage(tempCanvas, 0, 0, containerWidth, containerHeight);
+    }
+    
+    // Initialize when the page loads
+    window.addEventListener('load', init);
+</script>
+{% endblock %}

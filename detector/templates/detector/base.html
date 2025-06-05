@@ -28,6 +28,9 @@
                         <a class="nav-link {% if request.path == '/detector/' %}active{% endif %}" href="{% url 'index' %}">Detector</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link {% if request.path == '/air-painter/' %}active{% endif %}" href="{% url 'air_painter' %}"><i class="fas fa-paint-brush me-1"></i>Air Painter</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link {% if 'about' in request.path %}active{% endif %}" href="{% url 'about' %}">About</a>
                     </li>
                 </ul>
@@ -53,22 +56,24 @@
                     <ul class="list-unstyled">
                         <li class="mb-2"><a href="{% url 'landing' %}">Home</a></li>
                         <li class="mb-2"><a href="{% url 'index' %}">Detector</a></li>
+                        <li class="mb-2"><a href="{% url 'air_painter' %}">Air Painter</a></li>
                         <li><a href="{% url 'about' %}">About</a></li>
                     </ul>
                 </div>
                 <div class="col-lg-3 mb-4 mb-lg-0">
                     <h6 class="text-white mb-4">Features</h6>
                     <ul class="list-unstyled">
-                        <li class="mb-2"><a href="#">Object Detection</a></li>
-                        <li class="mb-2"><a href="#">Face Recognition</a></li>
-                        <li><a href="#">Motion Analysis</a></li>
+                        <li class="mb-2"><a href="{% url 'index' %}">Object Detection</a></li>
+                        <li class="mb-2"><a href="{% url 'air_painter' %}">Air Painter</a></li>
+                        <li class="mb-2"><a href="#">Hand Gesture Recognition</a></li>
+                        <li><a href="#">Computer Vision</a></li>
                     </ul>
                 </div>
                 <div class="col-lg-3">
                     <h6 class="text-white mb-4">Connect</h6>
                     <div class="d-flex">
-                        <a href="https://github.com/ZamoRzgar" class="me-3" target="_blank" rel="noopener noreferrer">
-                            <i class="fab fa-github fa-lg"></i> GitHub
+                        <a href="https://github.com/ZamoRzgar" class="btn btn-outline-light me-3" target="_blank" rel="noopener noreferrer">
+                            <i class="fab fa-github fa-lg me-2"></i> GitHub
                         </a>
                     </div>
                 </div>

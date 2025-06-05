@@ -1,17 +1,31 @@
 # Visual AI: Object Detection Application
 
-A modern web application that detects objects in images using advanced computer vision. The app offers two convenient ways to analyze images: capture directly from your webcam or upload existing images from your device. It provides detailed descriptions and visual annotations of the objects it detects.
+A modern web application that combines advanced computer vision capabilities. The app offers multiple interactive features:
+
+1. **Object Detection**: Analyze images from your webcam or uploaded photos to identify and label objects
+2. **Air Painter**: Draw in the air using hand gestures with different colors, shapes, and brush sizes
 
 ## Features
 
+### Object Detection
 - **Dual Input Methods**:
   - Webcam capture for real-time image analysis
   - Image upload for analyzing existing photos
 - Utilizes YOLO v8 (You Only Look Once) model for fast and accurate detection
-- Web-based interface with no installation required
 - Displays bounding boxes around detected objects with confidence scores
 - Provides natural language descriptions of detected objects
+
+### Air Painter
+- Draw in the air using hand gestures tracked by MediaPipe
+- Multiple drawing modes: freehand drawing, rectangles, stars, and hearts
+- Color palette with various options including an eraser
+- Adjustable brush thickness
+- Save your creations as PNG images
+
+### General Features
+- Web-based interface with no installation required
 - Modern, responsive design that works across devices
+- Intuitive tabbed interface for easy navigation between features
 
 ## Model Information
 
@@ -65,48 +79,71 @@ This application uses the YOLO v8 model from Ultralytics, which is a state-of-th
 
 ## Usage
 
-### Webcam Method
+### Object Detection
+
+#### Webcam Method
 1. Navigate to the detector page
 2. Select the "Webcam" tab (selected by default)
 3. Click "Start Webcam" and grant camera permissions when prompted
 4. Position objects in front of your camera that you want to detect
 5. Click the "Capture & Detect" button to process the current frame
 
-### Upload Method
+#### Upload Method
 1. Navigate to the detector page
 2. Select the "Upload Image" tab
 3. Click "Select Image" to choose an image from your device
 4. Once your image appears in the preview, click "Detect Objects"
 
-### Results
+#### Results
 - View the processed image with detection boxes highlighting identified objects
 - Explore the detailed list of detected objects and their confidence scores
 - Read the natural language description summarizing what was found
 - Click "Detect Another Object" to return to the detector interface
 
+### Air Painter
+
+1. Navigate to the Air Painter page from the navigation menu
+2. Click the "Start Camera" button and grant camera permissions when prompted
+3. Use your hand to draw in the air:
+   - Raise your index finger above your middle finger to start drawing
+   - Lower your index finger below your middle finger to stop drawing
+   - Move your hand to create drawings in the air
+4. Use the controls at the bottom to:
+   - Change colors (purple, blue, green, red, or eraser)
+   - Switch drawing modes (freehand, rectangle, star, heart)
+   - Adjust brush thickness using the slider
+   - Clear the canvas or save your drawing as an image
+
 ## Project Structure
 
 ```
 object-detection-app/
-├── detector/                 # Main Django app
-│   ├── templates/            # HTML templates
-│   │   └── detector/         # App-specific templates
-│   │       ├── about.html    # About page
-│   │       ├── base.html     # Base template with common elements
-│   │       ├── index.html    # Detector page with webcam
-│   │       ├── landing.html  # Landing/home page
-│   │       └── result.html   # Results display page
-│   ├── urls.py               # URL routing
-│   └── views.py              # View functions
-├── object_detector/          # Django project settings
-├── static/                   # Static files
-│   ├── css/                  # Stylesheets
-│   ├── img/                  # Images
-│   └── js/                   # JavaScript files
-├── venv/                     # Virtual environment (not in repo)
-├── requirements.txt          # Python dependencies
-├── manage.py                 # Django management script
-└── yolov8n.pt               # YOLO v8 model weights
+├── detector/                # Main Django app
+│   ├── static/              # Static files (CSS, JS, images)
+│   ├── templates/           # HTML templates
+│   │   └── detector/        # App-specific templates
+│   │       ├── about.html   # About page template
+│   │       ├── air_painter.html # Air Painter feature template
+│   │       ├── base.html    # Base template with common elements
+│   │       ├── index.html   # Main detector page template
+│   │       └── results.html # Results page template
+│   ├── __init__.py         # Python package indicator
+│   ├── admin.py            # Django admin configuration
+│   ├── apps.py             # App configuration
+│   ├── models.py           # Database models
+│   ├── tests.py            # Unit tests
+│   ├── urls.py             # URL routing
+│   └── views.py            # View functions
+├── object_detection_app/   # Project settings
+│   ├── __init__.py         # Python package indicator
+│   ├── asgi.py             # ASGI configuration
+│   ├── settings.py         # Django settings
+│   ├── urls.py             # Project URL routing
+│   └── wsgi.py             # WSGI configuration
+├── static/                 # Collected static files
+├── air_painter.py          # Standalone Air Painter script (reference)
+├── manage.py               # Django management script
+└── requirements.txt        # Python dependencies
 ```
 
 ## Performance Considerations
